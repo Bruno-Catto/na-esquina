@@ -31,14 +31,13 @@ const searchInput = document.getElementById("search");
 function exibirProdutos(lista) {
   listaProdutos.innerHTML = "";
   lista.forEach(prod => {
-  const card = `<div class="card-produto">
-  <img src="${prod.imagem}" alt="${prod.nome}">
-  <h3>${prod.nome}</h3>
-  <p><strong>Preço:</strong> ${prod.preco}</p>
-  <p><strong>Loja:</strong> ${prod.loja}</p>
-  <p><strong>Endereço:</strong> ${prod.endereco}</p>
-</div>`;
-
+    const card = `<div class="card-produto">
+      <img src="${prod.imagem}" alt="${prod.nome}">
+      <h3>${prod.nome}</h3>
+      <p><strong>Preço:</strong> ${prod.preco}</p>
+      <p><strong>Loja:</strong> ${prod.loja}</p>
+      <p><strong>Endereço:</strong> ${prod.endereco}</p>
+    </div>`;
     listaProdutos.innerHTML += card;
   });
 }
@@ -78,3 +77,67 @@ function enviarCadastro() {
 }
 
 exibirProdutos(produtos);
+
+// ----------------------------
+// Função de Testes Integrada
+// ----------------------------
+
+function rodarTestes() {
+  const output = [];
+  const print = (msg, ok = true) => {
+    console.log(`${ok ? '✅' : '❌'} ${msg}`);
+    output.push(`${ok ? '✅' : '❌'} ${msg}`);
+  };
+
+  try {
+    const produtosTeste = [
+      {
+        nome: "Produto Teste",
+        categoria: "Roupas",
+        preco: "R$ 99,00",
+        loja: "Loja X",
+        endereco: "Rua Teste",
+        imagem: "https://via.placeholder.com/250"
+      }
+    ];
+
+    exibirProdutos(produtosTeste);
+    const cards = document.querySelectorAll('.card-produto');
+    if (cards.length === 1 && cards[0].textContent.includes("Produto Teste")) {
+      print("exibirProdutos() funciona corretamente");
+    } else {
+      print("exibirProdutos() falhou ao exibir produto", false);
+    }
+
+    filtrarCategoria("Roupas");
+    const filtrados = document.querySelectorAll('.card-produto');
+    if (filtrados.length >= 1 && filtrados[0].textContent.includes("Camisa Polo")) {
+      print("filtrarCategoria() funciona corretamente");
+    } else {
+      print("filtrarCategoria() não retornou produto esperado", false);
+    }
+
+    abrirCadastro();
+    const modal = document.getElementById('modalCadastro');
+    if (modal && modal.style.display === 'flex') {
+      print("abrirCadastro() exibe o modal corretamente");
+    } else {
+      print("abrirCadastro() não exibiu o modal", false);
+    }
+
+    searchInput.value = "fone";
+    searchInput.dispatchEvent(new Event("input"));
+    const resultadosBusca = document.querySelectorAll('.card-produto');
+    const encontrou = Array.from(resultadosBusca).some(c => c.textContent.toLowerCase().includes("fone"));
+    if (encontrou) {
+      print("Busca por nome funciona corretamente");
+    } else {
+      print("Busca por nome falhou", false);
+    }
+
+  } catch (err) {
+    print("Erro ao executar testes: " + err.message, false);
+  }
+
+  return output;
+}
